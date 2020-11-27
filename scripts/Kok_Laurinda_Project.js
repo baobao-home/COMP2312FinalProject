@@ -134,8 +134,7 @@ $(".btn").click(function(){
 
 });
 
-
-
+//function to match your guess letter
 function matchLetter(guess) {
     console.log('matchLetter: ' + guess);
 
@@ -144,52 +143,41 @@ function matchLetter(guess) {
     console.dir(theWord);
     console.dir(theWordInArray);
 
+    //create an array of empty slots
     let letterSlots = [theWord.length];
+
+    //update letterslots with every guess to get the main letterSlotsInPlay
     letterSlots = letterSlotsInPlay;
 
-    //flag to check if no match
-    let youMadeAnincorrectGuess = false;
-
-    console.dir('before: ' +letterSlots);
-
-
-    //matching each characters and update the slot array
-    theWordInArray.forEach(function(element, index) {
-        //if match
-        if(element == guess) {
-            letterSlots[index] = element;
-
-            //update remaining letters to guess
-            remainingLettersToGuess--;
-            outpputRemainingLettersToGuess.innerHTML = remainingLettersToGuess;
-
-            //update image
-            updateAnimationCorrect();
-        }
-        //if no match
-        else {
-            youMadeAnincorrectGuess = true;
-        }
-    });
-    letterSlotsInPlay = letterSlots;
-    updateLetterSlots();
-
-    //made incorrect guess
-    //update guess remaining
-    if(youMadeAnincorrectGuess == true ) {
-        updateAnimationIncorrect();
+    //if word includes guess letter
+    if(theWordInArray.includes(guess)) {
+          
+        //matching each character and update the letter slot array
+        theWordInArray.forEach(function(element, index) {
+            //if match
+            if(element == guess) {
+                letterSlots[index] = element;
+    
+                //update remaining letters to guess
+                remainingLettersToGuess--;
+                outpputRemainingLettersToGuess.innerHTML = remainingLettersToGuess;
+    
+                //update image
+                updateAnimationCorrect();
+            }
+        });
+        letterSlotsInPlay = letterSlots;
+        updateLetterSlots();
+    }
+    //no match in word
+    else {
         guessRemaining--;
         outputGuessRemaining.innerHTML = `${guessRemaining}/${maxGuesses}`;
+        updateAnimationIncorrect();      
     }
-
-    //reset flag to default false
-    //youMadeAnincorrectGuess == false;
-    
-    console.log(guessRemaining);
-    console.dir('letterSlots: ' + letterSlots);
-    console.dir("letterSlotsInPlay:" + letterSlotsInPlay);
 }
 
+//function to update the display letter slots
 function updateLetterSlots() {
     letterSlotsPlaceholder.innerHTML = "";
     let slotString;
@@ -205,7 +193,7 @@ function updateLetterSlots() {
     letterSlotsPlaceholder.innerHTML = slotString;
 }
 
-//guess is correct
+//function to update image if guess is correct
 function updateAnimationCorrect() {
     let imagePath = "images";
 
@@ -225,7 +213,7 @@ function updateAnimationCorrect() {
         }
 }
     
-//guess is incorrect
+//funcion to update image if guess is incorrect
  function updateAnimationIncorrect() {
     let imagePath = "images";
 
@@ -235,7 +223,6 @@ function updateAnimationCorrect() {
         if(guessRemaining  == 6) {
             //update image inccorrect
             imagePlaceholder.src = `${imagePath}/incorrect1.png`;
-
         }
         else if (guessRemaining == 5) {
             imagePlaceholder.src = `${imagePath}/incorrect2.png`;
