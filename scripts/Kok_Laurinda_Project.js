@@ -134,8 +134,10 @@ $(".btn").click(function(){
 
 });
 
+
+
 function matchLetter(guess) {
-    console.log('matchLetter function: ' + guess);
+    console.log('matchLetter: ' + guess);
 
     //convert the word string into an array for matching
     let theWordInArray = theWord.toUpperCase().split('');
@@ -149,6 +151,8 @@ function matchLetter(guess) {
     let youMadeAnincorrectGuess = false;
 
     console.dir('before: ' +letterSlots);
+
+
     //matching each characters and update the slot array
     theWordInArray.forEach(function(element, index) {
         //if match
@@ -160,7 +164,7 @@ function matchLetter(guess) {
             outpputRemainingLettersToGuess.innerHTML = remainingLettersToGuess;
 
             //update image
-            updateAnimation(true);
+            updateAnimationCorrect();
         }
         //if no match
         else {
@@ -170,15 +174,16 @@ function matchLetter(guess) {
     letterSlotsInPlay = letterSlots;
     updateLetterSlots();
 
+    //made incorrect guess
     //update guess remaining
     if(youMadeAnincorrectGuess == true ) {
-        updateAnimation(false);
+        updateAnimationIncorrect();
         guessRemaining--;
         outputGuessRemaining.innerHTML = `${guessRemaining}/${maxGuesses}`;
-        
-        //reset flag to default false
-        youMadeAnincorrectGuess == false;
     }
+
+    //reset flag to default false
+    //youMadeAnincorrectGuess == false;
     
     console.log(guessRemaining);
     console.dir('letterSlots: ' + letterSlots);
@@ -200,11 +205,10 @@ function updateLetterSlots() {
     letterSlotsPlaceholder.innerHTML = slotString;
 }
 
-
-function updateAnimation(guessIsCorrect) {
+//guess is correct
+function updateAnimationCorrect() {
     let imagePath = "images";
-    //guess is correct
-    if(guessIsCorrect == true) {
+
         //play a sound
         soundCorrect.play();
 
@@ -219,9 +223,12 @@ function updateAnimation(guessIsCorrect) {
             gameResultBox.style.visibility = "visible";
             resultImage.innerHTML = `<img src='${imagePath}/youWon.gif' style="width:500px"/>`;
         }
-    }
-    //guess is incorrect
-    else {
+}
+    
+//guess is incorrect
+ function updateAnimationIncorrect() {
+    let imagePath = "images";
+
         //play incorrect sound
         soundIncorrect.play();
 
@@ -256,8 +263,8 @@ function updateAnimation(guessIsCorrect) {
             gameResultBox.style.visibility = "visible";
             resultImage.innerHTML = `<img src='${imagePath}/youLost.gif' style="height:250px" />`;
         }
-    }
- }
+}
+ 
 
 
 //button to close the popup
