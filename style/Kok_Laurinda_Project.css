@@ -64,6 +64,7 @@ ul li::before {
 h1 {
   color: #363636;
   text-shadow: 1px 1px 5px skyblue;
+  font-size: medium;
 }
 
 h2 {
@@ -81,28 +82,8 @@ h2 {
   z-index: 100;
 }
 
-#gameResult {
-  display: none;
-  background-color: gainsboro;
-  width: 500px;
-  height: 400px;
-  padding: 10px 100px;
-  position: absolute;
-  top: 20%;
-  left: 10%;
-  border: 1px solid #000000;
-  box-shadow: 5px 10px 8px #999999;
-  text-align: center;
-}
-
-#resultWinLost {
-  margin: 10px 0px;
-  font-size: large;
-  font-weight: bolder;
-}
-
 #imagePlaceholder {
-  max-height: 420px;
+  max-height: 400px;
 }
 
 button.btn {
@@ -136,18 +117,48 @@ button.btn {
   background-color: coral;
   border: 1px solid red;
   color: #363636;
+  font-weight: bolder;
 }
 
 .incorrectLastWarning {
   background-color: red;
   border: 1px solid #8b0000;
   color: white;
+  font-weight: bolder;
 }
 
 .incorrectDying {
   background-color: red;
   border: 1px solid black;
   color: white;
-  font-size: larger;
   font-weight: bolder;
+  font-size: larger;
+}
+
+#gameResult {
+  display: none;
+  background-color: gainsboro;
+  width: 500px;
+  height: 400px;
+  padding: 10px 100px;
+  position: absolute;
+  top: 25%;
+  left: 15%;
+  border: 1px solid #000000;
+  box-shadow: 5px 10px 8px #999999;
+  text-align: center;
+}
+
+#resultWinLost {
+  margin: 10px 0px;
+  font-size: large;
+  font-weight: bolder;
+}
+
+#btn-playAgain {
+  font-size: large;
+  padding: 5px;
+  margin: 5px;
+  box-shadow: 3px 5px 8px #363636;
+  cursor: pointer;
 }

@@ -239,6 +239,8 @@ function updateAnimationCorrect() {
              updateIncorrectStatus();           
             //update style for last warning for incorrect guess
             $("#incorrectGuesses").removeClass("incorrectWarning").addClass('incorrectLastWarning');
+
+            $("#incorrectGuesses").prepend('WARNING: ');
         }
         //using up all guesses
         else if (guessRemaining == 0) {
@@ -257,6 +259,8 @@ function updateAnimationCorrect() {
 
             //update style
             $("#incorrectGuesses").removeClass('incorrectLastWarning').addClass('incorrectDying');
+
+            $("#incorrectGuesses").prepend("GAME OVER: ");
 
            //delay popup result to display losing result
            setTimeout(function(){
