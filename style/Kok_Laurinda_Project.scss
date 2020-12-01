@@ -3,6 +3,13 @@
 $darkGrey: #363636;
 $darkRed: #8b0000;
 
+//mixin for warning box style
+@mixin incorrectStyle($backgroundColor, $borderColor, $textColor){
+    background-color: $backgroundColor;
+    border: 1px solid $borderColor;
+    color: $textColor;
+}
+
 body {
     font-family: tacoma, verdana, arial;
     font-size: 12px;
@@ -138,14 +145,15 @@ button.btn {
 }
 
 .incorrectWarning {
-    background-color: coral;
-    border: 2px solid red;   
+    @include incorrectStyle(coral, red, $darkGrey)
 }    
 
 .incorrectLastWarning {
-    background-color: red;  
-    border: 2px solid $darkRed;
-    color: white;    
+    @include incorrectStyle(red, $darkRed, white) 
 }
 
-
+.incorrectDying {
+    @include incorrectStyle(red, black, white);
+    font-size: larger;
+    font-weight: bolder;
+}

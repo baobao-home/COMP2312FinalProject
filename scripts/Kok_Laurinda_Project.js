@@ -45,7 +45,7 @@ const word6 = new Word('chocolate', 'Something dark and sweet and yummy')
 let arrayOfWords = [word1, word2, word3, word4, word5, word6];
 
 //the word In Play
-let theWord;
+let theWord = {};
 
 //guess a Letter
 let yourGuess;
@@ -256,7 +256,7 @@ function updateAnimationCorrect() {
             updateIncorrectStatus();
 
             //update style
-            $("#incorrectGuesses").css('font-weight','bolder').css('font-size','larger');
+            $("#incorrectGuesses").removeClass('incorrectLastWarning').addClass('incorrectDying');
 
            //delay popup result to display losing result
            setTimeout(function(){
