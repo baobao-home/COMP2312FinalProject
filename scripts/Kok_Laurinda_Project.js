@@ -4,9 +4,6 @@ Kok_Laurinda_COMP_2312_Project
 const imagePlaceholder = document.getElementById("imagePlaceholder");
 const letterSlotsPlaceholder    = document.getElementById("letterSlotsPlaceholder");
 const hintToGuessPlaceholder = document.getElementById("hintToGuess");
-const incorrectGuesses = document.getElementById("incorrectGuesses");
-const keyboardPlaceholder     = document.getElementById("keyboardPlaceholder");
-const outputGameInProgress = document.getElementById("output_gameInProgress");
 const outpputRemainingLettersToGuess = document.getElementById("output_remainingLettersToGuess");
 const outputGuessRemaining = document.getElementById('output_guessRemaining');
 
@@ -15,17 +12,10 @@ const gameResultBox = document.getElementById('gameResult');
 const btnPlayAgain = document.getElementById('btn-playAgain');
 const resultImage = document.getElementById('resultImage');
 
-
+const imagePath = "images";
 
 //boolean to track if game is in progress
 let gameHasStarted = true;
-
-//boolean to track winning or losing
-let youWin = false;
-let youLose = false;
-
-//max num of guesses
-const maxGuesses = 7;
 
 //word object
 class Word {
@@ -49,9 +39,10 @@ const word2 = new Word('beaver', 'An animal associated with Canada');
 const word3 = new Word('vancouver', 'A city in Beautiful British Columbia');
 const word4 = new Word('whistler', 'A ski resort near Vancouver');
 const word5 = new Word('rabbit', 'An animal with long ears');
+const word6 = new Word('chocolate', 'Something dark and sweet and yummy')
 
 //create list of words
-let arrayOfWords = [word1, word2, word3, word4, word5];
+let arrayOfWords = [word1, word2, word3, word4, word5, word6];
 
 //the word In Play
 let theWord;
@@ -59,7 +50,7 @@ let theWord;
 //guess a Letter
 let yourGuess;
 
-//sound effects
+//sound objects
 const soundCorrect = new Audio("audio/correct.mp3");
 const soundIncorrect = new Audio("audio/incorrect.mp3");
 const soundWinning = new Audio("audio/musicWinning.mp3");
@@ -68,42 +59,267 @@ const soundLosing = new Audio("audio/musicLosing.mp3");
 /*
 Starting Game
 */
-//build keyboard
-//buildKeyboard();
 
 //draw new word
 drawWord();
 
-//initialize guess when game starts
-let guessRemaining;
-guessRemaining = maxGuesses;
-outputGuessRemaining.innerHTML = `Guess Remaining: ${guessRemaining}`;
+/* 
+initialize status when game starts 
+*/
+//max num of guesses
+const maxGuesses = 7;
+
+let guessRemaining = maxGuesses;
+
 let remainingLettersToGuess;
-
 remainingLettersToGuess = theWord.length;
-console.log('remainingletterstoguess: ' + remainingLettersToGuess);
-console.log(youWin);
-outpputRemainingLettersToGuess.innerHTML = `Remaining Letters to Guess: ${theWord.length}`;
 
+//display status
+displayStatus(guessRemaining, remainingLettersToGuess);
 
-//Letter slots
+//create letter slots array in the size of theWord
 let letterSlotsInPlay = new Array(theWord.length);
 let emptySlot = "_ "; 
 let startingSlots = "";
+
+//create letter slots to display
 startingSlots += emptySlot.repeat(theWord.length);
 letterSlotsPlaceholder.innerHTML = startingSlots;
-console.dir(startingSlots);
+
+//counter for dying animation
+let counterDying = 0;
+
+//creating eventlistener for each key
+$(".btn").click(function(){
+    yourGuess = $(this).text();
+
+    //match guesssing letter with theWord
+    matchLetter(yourGuess);
+
+    //disable button
+    $(this).attr('disabled', 'disabled');
+});
+
+/*
+All functions follow here
+*/
 
 //randomly draw a word from list
 function drawWord() {
+    //random number. maximum num is the size of array
     let index = Math.round(Math.random() * arrayOfWords.length);
     theWord = arrayOfWords[index].spellWord();
-    console.log(theWord);
+    //display hint
     hintToGuessPlaceholder.innerHTML = "HINT: " + arrayOfWords[index].describeHint();
+}
 
+//function to update status display
+function displayStatus(NumGuessRemaining, NumRemainingLetters) {
+    outputGuessRemaining.innerHTML = `Guess Remaining: ${NumGuessRemaining}/${maxGuesses}`;
+    outpputRemainingLettersToGuess.innerHTML = `Remaining letters to guess: ${NumRemainingLetters}`;
+}
+
+//function to match your guess letter
+function matchLetter(guess) {
+
+    //convert the word string into an array for matching
+    let theWordInArray = theWord.toUpperCase().split('');
+
+    //create an array of empty slots
+    let letterSlots = [theWord.length];
+
+    //update letterslots with every guess to get the main letterSlotsInPlay
+    letterSlots = letterSlotsInPlay;
+
+    //if word includes guess letter
+    if(theWordInArray.includes(guess)) {
+          
+        //matching each character and update the letter slot array
+        theWordInArray.forEach(function(element, index) {
+            //if match
+            if(element == guess) {
+                //same index in theWord and in letterSlots
+                letterSlots[index] = element;
+    
+                //update remaining letters to guess
+                remainingLettersToGuess--;
+
+                //display status
+                displayStatus(guessRemaining, remainingLettersToGuess);
+    
+                //update image
+                updateAnimationCorrect();
+            }
+        });
+        //update letterSlotsInPlay with the updated newly matched letter slots
+        letterSlotsInPlay = letterSlots;
+        updateLetterSlotsDisplay();
+    }
+    //no match in word
+    else {
+        guessRemaining--;
+
+        //animation incoorect
+        updateAnimationIncorrect();      
+
+        //display status
+        displayStatus(guessRemaining, remainingLettersToGuess);
+    }
+}
+
+//function to update the display letter slots
+function updateLetterSlotsDisplay() {
+    //clear main slot display
+    letterSlotsPlaceholder.innerHTML = "";
+    let slotString = "";
+    for(let i= 0; i < letterSlotsInPlay.length; i++) {
+        //if array member is empty, return undefined
+        if (letterSlotsInPlay[i] == undefined) {
+            slotString += "_";
+        }
+        else {
+            slotString += letterSlotsInPlay[i];
+        }
+    }
+    //update main slot display
+    letterSlotsPlaceholder.innerHTML = slotString;
+}
+
+//function to update image if guess is correct
+function updateAnimationCorrect() {
+        //play a sound
+        soundCorrect.play();
+
+        //no more letters left to guess
+        if(remainingLettersToGuess == 0) {
+            //end game
+            gameHasStarted = false;
+
+            //disable keyboard
+            $(".btn").attr('disabled', 'disabled');
+            
+            //popup to display winning result
+            showPopUp('won');
+        }
+}
+
+//funcion to update image if guess is incorrect
+ function updateAnimationIncorrect() {
+
+        //play incorrect sound
+        soundIncorrect.play();
+
+        //unhide warning and add style to incorrect guess
+        $("#incorrectGuesses").css('visibility', "visible");
+        $("#incorrectGuesses").addClass("incorrectWarning");
+
+        if(guessRemaining  == 6) {
+            //update image inccorrect
+            imagePlaceholder.src = `${imagePath}/incorrect1.png`;
+            updateIncorrectStatus();
+        }
+        else if (guessRemaining == 5) {
+            imagePlaceholder.src = `${imagePath}/incorrect2.png`;
+            updateIncorrectStatus();
+        }
+        else if (guessRemaining == 4) {
+            imagePlaceholder.src = `${imagePath}/incorrect3.png`;
+            updateIncorrectStatus();
+        }
+        else if (guessRemaining == 3) {
+            imagePlaceholder.src = `${imagePath}/incorrect4.png`;
+            updateIncorrectStatus();
+        }        
+        else if (guessRemaining == 2) {
+            imagePlaceholder.src = `${imagePath}/incorrect5.png`;
+            updateIncorrectStatus();
+        }
+        else if (guessRemaining == 1) {
+            imagePlaceholder.src = `${imagePath}/incorrect6.png`;
+             updateIncorrectStatus();           
+            //update style for last warning for incorrect guess
+            $("#incorrectGuesses").removeClass("incorrectWarning").addClass('incorrectLastWarning');
+        }
+        //using up all guesses
+        else if (guessRemaining == 0) {
+
+            //animate dying
+            animationDying();
+
+            //ending game
+            gameHasStarted = false;
+
+            //disable keyboard
+            $(".btn").attr('disabled', 'disabled');
+
+            //update incorrect bar
+            updateIncorrectStatus();
+
+            //update style
+            $("#incorrectGuesses").css('font-weight','bolder').css('font-size','larger');
+
+           //delay popup result to display losing result
+           setTimeout(function(){
+            showPopUp('lost');            
+           }, 4500);
+        }
+}
+
+//function to update Incorrect warning box
+function updateIncorrectStatus() {
+    $("#incorrectGuesses").text(`Incorrect Guesses: ${guessRemaining}/${maxGuesses}`);
+}
+
+//function to show result popup
+function showPopUp(winOrLost) {
+    //show result popup
+    //$("#gameResult").css("visibility", "visible");
+    $("#gameResult").fadeIn('slow');
+
+    //display winning or losing message
+    if (winOrLost == 'won') {
+        //winning
+        resultImage.innerHTML = `<img src='${imagePath}/youWon.gif' style="width:500px"/>`;
+        $("#resultWinLost").text("YOU WON!");
+        soundWinning.play();
+    }
+    else if (winOrLost == 'lost'){
+        //losing
+        resultImage.innerHTML = `<img src='${imagePath}/youLost.gif' style="height:250px"/>`;   
+        $("#resultWinLost").text("YOU LOST!");    
+    }
+}
+
+//button to close the popup
+btnPlayAgain.addEventListener("click", function(){
+    //button works only if game has ended
+    if(!gameHasStarted) {
+        gameResultBox.style.visibility = "hidden";
+        //reload page to start new game
+        location.reload();
+    }
+});
+
+//function for dying animation
+function animationDying(){
+    let maxImageNum = 6;
+
+    //create interval to loop through dying images
+    let dyingInterval = setInterval(function(){
+        counterDying ++;
+
+        imagePlaceholder.src = imagePath + "/dying" + counterDying + ".png";
+        if(counterDying >= maxImageNum) {
+            clearInterval(dyingInterval);
+
+            //play losing audio
+            soundLosing.play();            
+        }
+    }, 400);
 }
 
 /*
+//this keyboard code doesn't work
 //get guess key
 function getKey(aKey) {
         let guessKey = aKey;
@@ -116,167 +332,7 @@ function buildKeyboard() {
 
     for(let index = 0; index < arrayOfKeys1.length; index++ ) {
         keyboardPlaceholder.innerHTML += `<button id ='btn-${arrayOfKeys1[index]}' value='${arrayOfKeys1[index]}' class = 'key' onclick='getKey(${arrayOfKeys1[index]})'>${arrayOfKeys1[index]}</button>`;
-
     }
 }
 */
 
-//creating eventlistener for each key
-$(".btn").click(function(){
-    yourGuess = $(this).text();
-    console.log(yourGuess);
-
-    //match guesssing letter with theWord
-    matchLetter(yourGuess);
-
-    //disable button
-    $(this).attr('disabled', 'disabled');
-
-});
-
-
-
-function matchLetter(guess) {
-    console.log('matchLetter: ' + guess);
-
-    //convert the word string into an array for matching
-    let theWordInArray = theWord.toUpperCase().split('');
-    console.dir(theWord);
-    console.dir(theWordInArray);
-
-    let letterSlots = [theWord.length];
-    letterSlots = letterSlotsInPlay;
-
-    //flag to check if no match
-    let youMadeAnincorrectGuess = false;
-
-    console.dir('before: ' +letterSlots);
-
-
-    //matching each characters and update the slot array
-    theWordInArray.forEach(function(element, index) {
-        //if match
-        if(element == guess) {
-            letterSlots[index] = element;
-
-            //update remaining letters to guess
-            remainingLettersToGuess--;
-            outpputRemainingLettersToGuess.innerHTML = remainingLettersToGuess;
-
-            //update image
-            updateAnimationCorrect();
-        }
-        //if no match
-        else {
-            youMadeAnincorrectGuess = true;
-        }
-    });
-    letterSlotsInPlay = letterSlots;
-    updateLetterSlots();
-
-    //made incorrect guess
-    //update guess remaining
-    if(youMadeAnincorrectGuess == true ) {
-        updateAnimationIncorrect();
-        guessRemaining--;
-        outputGuessRemaining.innerHTML = `${guessRemaining}/${maxGuesses}`;
-    }
-
-    //reset flag to default false
-    //youMadeAnincorrectGuess == false;
-    
-    console.log(guessRemaining);
-    console.dir('letterSlots: ' + letterSlots);
-    console.dir("letterSlotsInPlay:" + letterSlotsInPlay);
-}
-
-function updateLetterSlots() {
-    letterSlotsPlaceholder.innerHTML = "";
-    let slotString;
-    for(let i= 0; i < letterSlotsInPlay.length; i++) {
-        if (letterSlotsInPlay[i] == undefined) {
-            slotString += "_";
-        }
-        else {
-            slotString += letterSlotsInPlay[i];
-        }
-    }
-    console.dir(slotString);
-    letterSlotsPlaceholder.innerHTML = slotString;
-}
-
-//guess is correct
-function updateAnimationCorrect() {
-    let imagePath = "images";
-
-        //play a sound
-        soundCorrect.play();
-
-        //no more letters left to guess
-        if(remainingLettersToGuess == 0) {
-            //you won
-            youWin = true;
-            gameHasStarted = false;
-            console.log(youWin);
-            
-            //popup to display result
-            gameResultBox.style.visibility = "visible";
-            resultImage.innerHTML = `<img src='${imagePath}/youWon.gif' style="width:500px"/>`;
-        }
-}
-    
-//guess is incorrect
- function updateAnimationIncorrect() {
-    let imagePath = "images";
-
-        //play incorrect sound
-        soundIncorrect.play();
-
-        if(guessRemaining  == 6) {
-            //update image inccorrect
-            imagePlaceholder.src = `${imagePath}/incorrect1.png`;
-
-        }
-        else if (guessRemaining == 5) {
-            imagePlaceholder.src = `${imagePath}/incorrect2.png`;
-        }
-        else if (guessRemaining == 4) {
-            imagePlaceholder.src = `${imagePath}/incorrect3.png`;
-        }
-        else if (guessRemaining == 3) {
-            imagePlaceholder.src = `${imagePath}/incorrect4.png`;
-        }        
-        else if (guessRemaining == 2) {
-            imagePlaceholder.src = `${imagePath}/incorrect5.png`;
-        }
-        else if (guessRemaining == 1) {
-            imagePlaceholder.src = `${imagePath}/incorrect6.png`;
-        }
-        //using up all guesses
-        else if (guessRemaining == 0) {
-            imagePlaceholder.src = `${imagePath}/dying1.png`;
-
-            youLose = true;
-            gameHasStarted = false;
-
-            //popup to display info
-            gameResultBox.style.visibility = "visible";
-            resultImage.innerHTML = `<img src='${imagePath}/youLost.gif' style="height:250px" />`;
-        }
-}
- 
-
-
-//button to close the popup
-btnPlayAgain.addEventListener("click", function(){
-    if(!gameHasStarted) {
-        gameResultBox.style.visibility = "hidden";
-        //reload page
-        location.reload();
-    }
-});
-
-function animationDying(){
-    let maxImageNum = 5;
-
-}
