@@ -127,11 +127,11 @@ button.btn {
 }
 
 .incorrectWarning {
-    @include incorrectStyle(coral, red, $darkGrey)
+    @include incorrectStyle(coral, red, $darkGrey);
 }    
 
 .incorrectLastWarning {
-    @include incorrectStyle(red, $darkRed, white) 
+    @include incorrectStyle(red, $darkRed, white); 
 }
 
 .incorrectDying {
